@@ -1,13 +1,13 @@
 'use client';
 // ^ this file needs the "use client" pragma
 
-import { ApolloLink, HttpLink } from '@apollo/client';
+import {HttpLink } from '@apollo/client';
 import {
  ApolloNextAppProvider,
  ApolloClient,
- InMemoryCache,
- SSRMultipartLink,
+ InMemoryCache
 } from '@apollo/experimental-nextjs-app-support';
+import React from 'react';
 
 // have a function to create a client for you
 function makeClient() {
@@ -27,7 +27,7 @@ function makeClient() {
  return new ApolloClient({
   // use the `InMemoryCache` from "@apollo/experimental-nextjs-app-support"
   cache: new InMemoryCache(),
-  link: HttpLink,
+  link: httpLink,
  });
 }
 
