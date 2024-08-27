@@ -27,6 +27,6 @@
   "**/*.tsx",
   ".next/types/**/*.ts",
   "app/lib/ApolloWrapper.jsx"
- ],
+, "app/lib/provider.jsx" ],
  "exclude": ["node_modules"]
 }

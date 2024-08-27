@@ -1,7 +1,7 @@
-import { ApolloWrapper } from './lib/ApolloWrapper';
-import StyleSheetManager from './lib/registry';
+import { AppProvider } from './lib/provider';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import GlobalStyles from './styles/global-style.styles';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -17,9 +17,10 @@ export default function RootLayout({
  return (
   <html lang="en">
    <body className={inter.className}>
-    <ApolloWrapper>
-     <StyleSheetManager>{children}</StyleSheetManager>
-    </ApolloWrapper>
+    <AppProvider>
+     <GlobalStyles />
+     {children}
+    </AppProvider>
    </body>
   </html>
  );
