@@ -1,15 +1,22 @@
-import { colors, ColorsInterface } from './default/colors.styles';
+import { brakpoint, BreakepointInterface } from './default/breakpoints';
+import { colors, ColorsInterface, contrastContainer, opacityColor } from './default/colors.styles';
 import { font, FontInterface} from './default/fonts.styles';
 import { space, SpaceInterface } from './default/space.styles';
 
 export type Theme = {
     colors: ColorsInterface,
     font: FontInterface,
-    space: SpaceInterface
+    space: SpaceInterface,
+    brakpoint: BreakepointInterface,
+    opacity: (color: string, opacity: number) => string
+    contrastContainer: () => unknown
 }
 
 export const theme: Theme = {
  colors,
  font,
- space
+ space,
+ brakpoint,
+ opacity: opacityColor,
+ contrastContainer: contrastContainer
 };

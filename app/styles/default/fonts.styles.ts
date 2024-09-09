@@ -11,6 +11,7 @@ interface FontSizeInterface {
     h6: string
     default: string
     button: string
+    caption: string
 }
 
 interface FontWeightInterface {
@@ -38,7 +39,8 @@ const fontSize: FontSizeInterface = {
     h5: 'clamp(1.2rem, .6667vw + .9333rem, 1.6rem)',
     h6: 'clamp(.8rem, .6667vw + .5333rem, 1.2rem)',
     default: 'clamp(.8rem, 1.6667vw + .1333rem, 1.6rem)',
-    button: 'clamp(1.2rem, 1.6667vw + .1333rem, 1.6rem)',
+    button: 'clamp(1.2rem, 1.6667vw + .1333rem, 1.8rem)',
+    caption: 'clamp(.6rem, 16667vw + .1333rem, 1rem'
 }
 
 const fontWeight: FontWeightInterface = {

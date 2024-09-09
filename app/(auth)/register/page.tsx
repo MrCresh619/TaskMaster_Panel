@@ -1,14 +1,12 @@
 'use client';
-import { ApolloError, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
-import { LOGIN_MUTATION } from './graphql/mutations';
 import { Label } from '@/app/ui/atoms/label/label.styles';
 import { StyledButton } from '@/app/ui/atoms/button/button..styles';
 import { StyledInput } from '@/app/ui/atoms/input/input.styles';
 import styled from 'styled-components';
 import { useIsClient } from '@/app/utils/hooks/isClient.hook';
-import { authUser } from '../auth';
-import { useRouter } from 'next/navigation';
+import { REGISTER_MUTATION } from '../login/graphql/mutations';
 
 const Wrapper = styled.section`
  display: grid;
@@ -46,30 +44,32 @@ const ButtonContainer = styled.div`
 `;
 
 export default function Login() {
- const [login, { loading }] = useMutation(LOGIN_MUTATION);
+ const [register] = useMutation(REGISTER_MUTATION);
  const isClient = useIsClient();
- const router = useRouter();
 
- const loginForm = useFormik({
+ const registerForm = useFormik({
   initialValues: {
    username: '',
    password: '',
+   rePassword: '',
+   email: '',
   },
-  onSubmit: async (values, { setSubmitting }) => {
+  onSubmit: async (values) => {
    try {
-    const response = await login({ variables: { ...values } });
-    if (response.data) {
-     const token = response.data.login;
-     authUser(token);
-     if (!response?.errors) {
-      router.push('/');
-     }
+    if (values.password === values.rePassword) {
+     const respone = await register({
+      variables: {
+       username: values.username,
+       password: values.password,
+       email: values.email,
+      },
+     });
+     console.log(respone);
+    } else {
+     console.log('error');
     }
    } catch (error) {
-    const errorMessage = error as ApolloError;
-    console.log(errorMessage);
-   } finally {
-    setSubmitting(false);
+    console.error(error);
    }
   },
  });
@@ -77,29 +77,45 @@ export default function Login() {
  return isClient ? (
   <Wrapper>
    <Empty></Empty>
-   <LoginForm onSubmit={loginForm.handleSubmit}>
+   <LoginForm onSubmit={registerForm.handleSubmit}>
     <FormField>
-     <Label htmlFor="username">Justynka Sodziaczek</Label>
+     <Label htmlFor="username">Nazwa Użytkownia</Label>
      <StyledInput
       id="username"
       type="text"
-      onChange={loginForm.handleChange}
-      value={loginForm.values.username}
+      onChange={registerForm.handleChange}
+      value={registerForm.values.username}
      />
     </FormField>
     <FormField>
-     <Label htmlFor="password">Justynka Sodziaczek</Label>
+     <Label htmlFor="password">Hasło</Label>
      <StyledInput
       id="password"
       type="password"
-      onChange={loginForm.handleChange}
-      value={loginForm.values.password}
+      onChange={registerForm.handleChange}
+      value={registerForm.values.password}
+     />
+    </FormField>
+    <FormField>
+     <Label htmlFor="rePassword">Potwierdź Hasło</Label>
+     <StyledInput
+      id="rePassword"
+      type="password"
+      onChange={registerForm.handleChange}
+      value={registerForm.values.rePassword}
+     />
+    </FormField>
+    <FormField>
+     <Label htmlFor="email">E-mail</Label>
+     <StyledInput
+      id="email"
+      type="email"
+      onChange={registerForm.handleChange}
+      value={registerForm.values.email}
      />
     </FormField>
     <ButtonContainer>
-     <StyledButton type="submit" disabled={loginForm.isSubmitting || loading}>
-      {loading ? 'Logging in...' : 'Submit'}
-     </StyledButton>
+     <StyledButton type="submit">Submit</StyledButton>
     </ButtonContainer>
    </LoginForm>
   </Wrapper>

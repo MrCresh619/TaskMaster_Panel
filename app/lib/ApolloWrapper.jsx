@@ -1,13 +1,15 @@
 'use client';
 // ^ this file needs the "use client" pragma
 
-import { HttpLink } from '@apollo/client';
+import { ApolloLink, HttpLink } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
 import {
  ApolloNextAppProvider,
  ApolloClient,
  InMemoryCache,
 } from '@apollo/experimental-nextjs-app-support';
 import React from 'react';
+import { refreshToken } from '../(auth)/auth';
 
 // have a function to create a client for you
 function makeClient() {
@@ -23,11 +25,41 @@ function makeClient() {
   // const { data } = useSuspenseQuery(MY_QUERY, { context: { fetchOptions: { cache: "force-cache" }}});
  });
 
+ const authLink = setContext(async (_, { headers }) => {
+    // Pobierz tokeny z localStorage
+    let tokens = JSON.parse(localStorage.getItem('Authentication') || 'null');
+    
+    // Sprawdź, czy token istnieje, i czy wygasł
+    if (tokens && new Date(tokens.accessTokenExpiresAt) < new Date()) {
+        // Token wygasł, spróbuj odświeżyć
+        const newAccessToken = await refreshToken();
+        if (newAccessToken) {
+            tokens = JSON.parse(localStorage.getItem('Authentication') || 'null'); // Zaktualizuj tokeny po odświeżeniu
+        } else {
+            // Jeśli refresh token wygasł lub jest nieprawidłowy, usuń tokeny
+            localStorage.removeItem('Authentication');
+            tokens = null;
+        }
+    }
+
+    // Jeżeli token istnieje, dodaj go do nagłówka Authorization
+    const authorizationHeader = tokens?.accessToken ? `Bearer ${tokens.accessToken}` : '';
+
+    // Zwróć nagłówki (bez Authorization, jeśli token nie istnieje)
+    return {
+        headers: {
+            ...headers,
+            ...(authorizationHeader ? { authorization: authorizationHeader } : {}), // Dodaj Authorization tylko, gdy token istnieje
+        },
+    };
+});
+
+
  // use the `ApolloClient` from "@apollo/experimental-nextjs-app-support"
  return new ApolloClient({
   // use the `InMemoryCache` from "@apollo/experimental-nextjs-app-support"
   cache: new InMemoryCache(),
-  link: httpLink,
+  link: ApolloLink.from([authLink, httpLink]),
  });
 }
 
